@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.env
+.venv/
+venv/
+
+# Logs
+*.log
+
+# Byte-compiled / optimized / DLL files
+*.so
+
+# Test and coverage
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS files
+.DS_Store
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Project artifacts
+uploads/
+outputs/
+creds/
+
+# Node (if frontend appears later)
+node_modules/
+
+# Docker
+.dockerignore
