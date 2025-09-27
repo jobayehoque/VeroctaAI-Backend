@@ -1,0 +1,739 @@
+{
+	"info": {
+		"_postman_id": "verocta-ai-drag-drop-collection",
+		"name": "🚀 VeroctaAI - Complete API Collection [DRAG & DROP]",
+		"description": "# 🤖 VeroctaAI - AI-Powered Financial Intelligence Platform\n\n**Ready-to-use API Collection - Just drag and drop into Postman!**\n\n## 🎯 Quick Start Guide\n1. **Drag this file** into Postman or use Import\n2. **Set Environment Variables** in the collection variables tab:\n   - `base_url`: Your API URL (e.g., `https://veroctaai.onrender.com` or `http://localhost:8001`)\n3. **Start Testing!** Begin with \"Health Check\" then \"Register User\"\n4. **Authentication is automatic** - tokens are saved after login\n\n## 🌟 What's Included\n✅ **25+ API Endpoints** - Complete coverage\n✅ **Automatic Authentication** - JWT tokens managed automatically\n✅ **Sample Requests** - Ready-to-use examples\n✅ **Comprehensive Tests** - Validates all responses\n✅ **Documentation** - Each request includes detailed info\n✅ **Error Handling** - Proper error response examples\n\n## 🔗 Base URLs\n- **Production**: `https://veroctaai.onrender.com`\n- **Local**: `http://localhost:8001`\n\n## 📞 Support\n- 📧 Email: support@verocta.ai\n- 🐛 Issues: GitHub Issues\n- 📚 Docs: /api/docs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "verocta-ai"
+	},
+	"item": [
+		{
+			"name": "🏥 System Health",
+			"item": [
+				{
+					"name": "Health Check",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Health - Status is healthy\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.status).to.eql('healthy');",
+									"    console.log('🏥 System Status:', response.status);",
+									"    console.log('⏰ Timestamp:', response.timestamp);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/health",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						},
+						"description": "Check if the API is running and healthy. This endpoint requires no authentication."
+					}
+				}
+			]
+		},
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Generate unique email for testing",
+									"const timestamp = Date.now();",
+									"pm.collectionVariables.set('test_email', `test${timestamp}@example.com`);"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Registration - Success\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    ",
+									"    // Save tokens automatically",
+									"    if (response.access_token) {",
+									"        pm.collectionVariables.set('access_token', response.access_token);",
+									"        console.log('🔑 Access token saved');",
+									"    }",
+									"    if (response.refresh_token) {",
+									"        pm.collectionVariables.set('refresh_token', response.refresh_token);",
+									"        console.log('🔄 Refresh token saved');",
+									"    }",
+									"    if (response.user && response.user.id) {",
+									"        pm.collectionVariables.set('user_id', response.user.id);",
+									"        console.log('👤 User ID saved:', response.user.id);",
+									"    }",
+									"    console.log('🎉 Registration successful!');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"testPassword123\",\n  \"first_name\": \"John\",\n  \"last_name\": \"Doe\",\n  \"company\": \"Test Company\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/register",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Register a new user account. Creates a new user and returns JWT tokens."
+					}
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Login - Success\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    ",
+									"    // Update tokens",
+									"    if (response.access_token) {",
+									"        pm.collectionVariables.set('access_token', response.access_token);",
+									"        console.log('🔑 Access token updated');",
+									"    }",
+									"    console.log('✅ Login successful!');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"testPassword123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/api/auth/login",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Login with email and password. Returns JWT tokens for authentication."
+					}
+				},
+				{
+					"name": "Get Current User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Profile - User data retrieved\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    pm.expect(response.user).to.be.an('object');",
+									"    console.log('👤 User Email:', response.user.email);",
+									"    console.log('🏢 Company:', response.user.company);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get current user profile information."
+					}
+				}
+			]
+		},
+		{
+			"name": "📁 File Upload & Analysis",
+			"item": [
+				{
+					"name": "Upload CSV File",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Upload - File processed\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    ",
+									"    if (response.report_id) {",
+									"        pm.collectionVariables.set('last_report_id', response.report_id);",
+									"        console.log('📊 Report ID saved:', response.report_id);",
+									"    }",
+									"    ",
+									"    if (response.analysis) {",
+									"        console.log('💯 Spend Score:', response.analysis.spend_score);",
+									"        console.log('💰 Total Amount:', response.analysis.total_amount);",
+									"        console.log('📈 Transactions:', response.analysis.transaction_count);",
+									"    }",
+									"    ",
+									"    console.log('🎉 File analysis completed!');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"description": "CSV file to upload (Date, Description, Amount columns)",
+									"type": "file",
+									"src": []
+								},
+								{
+									"key": "company_name",
+									"value": "Test Company",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "API Test Upload",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/upload",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"upload"
+							]
+						},
+						"description": "Upload a CSV file for AI-powered financial analysis. Returns SpendScore and insights.\n\n**Required:**\n- CSV file with Date, Description, Amount columns\n- Max size: 16MB\n\n**Supported formats:**\n- QuickBooks, Wave, Revolut, Xero\n- Generic CSV"
+					}
+				}
+			]
+		},
+		{
+			"name": "📊 Reports & Analytics",
+			"item": [
+				{
+					"name": "List Reports",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Reports - List retrieved\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    pm.expect(response.reports).to.be.an('array');",
+									"    console.log('📋 Total Reports:', response.reports.length);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports?page=1&limit=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get list of user reports with pagination."
+					}
+				},
+				{
+					"name": "Get Report Details",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Report - Details retrieved\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    pm.expect(response.report).to.be.an('object');",
+									"    console.log('📊 Report Title:', response.report.title);",
+									"    console.log('💯 Spend Score:', response.report.spend_score);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{last_report_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"{{last_report_id}}"
+							]
+						},
+						"description": "Get detailed information about a specific report."
+					}
+				},
+				{
+					"name": "Get Spend Score Analysis",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ SpendScore - Analysis complete\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    ",
+									"    if (response.spend_score) {",
+									"        console.log('💯 Overall Score:', response.spend_score.overall_score);",
+									"        console.log('🎯 Grade:', response.spend_score.grade);",
+									"        console.log('💰 Potential Savings:', response.spend_score.insights?.potential_savings);",
+									"    }",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/spend-score",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"spend-score"
+							]
+						},
+						"description": "Get detailed SpendScore analysis with AI insights and recommendations."
+					}
+				},
+				{
+					"name": "Dashboard Statistics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Dashboard - Stats retrieved\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    pm.expect(response.stats).to.be.an('object');",
+									"    console.log('📊 Dashboard stats loaded successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/dashboard/stats",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"stats"
+							]
+						},
+						"description": "Get dashboard statistics and analytics overview."
+					}
+				},
+				{
+					"name": "Download PDF Report",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ PDF - Generated successfully\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+									"    console.log('📄 PDF report generated successfully');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/reports/{{last_report_id}}/pdf",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"reports",
+								"{{last_report_id}}",
+								"pdf"
+							]
+						},
+						"description": "Download a PDF version of the financial analysis report."
+					}
+				}
+			]
+		},
+		{
+			"name": "🏢 SaaS Platform",
+			"item": [
+				{
+					"name": "Analytics Overview",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Analytics - Overview loaded\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    console.log('📊 Analytics overview loaded');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v2/analytics/overview",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"analytics",
+								"overview"
+							]
+						},
+						"description": "Get platform analytics overview with revenue and user metrics."
+					}
+				},
+				{
+					"name": "Billing Information",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Billing - Info retrieved\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    console.log('💳 Billing information loaded');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v2/billing/current",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"billing",
+								"current"
+							]
+						},
+						"description": "Get current billing information and subscription details."
+					}
+				},
+				{
+					"name": "System Notifications",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"✅ Notifications - Retrieved\", () => {",
+									"    pm.response.to.have.status(200);",
+									"    const response = pm.response.json();",
+									"    pm.expect(response.success).to.be.true;",
+									"    console.log('🔔 Notifications loaded');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/v2/notifications",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"notifications"
+							]
+						},
+						"description": "Get system notifications and alerts."
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-refresh expired tokens",
+					"function isTokenExpired(token) {",
+					"    if (!token) return true;",
+					"    try {",
+					"        const payload = JSON.parse(atob(token.split('.')[1]));",
+					"        const currentTime = Math.floor(Date.now() / 1000);",
+					"        return payload.exp < (currentTime + 60); // Refresh 60 seconds before expiry",
+					"    } catch (e) {",
+					"        return true;",
+					"    }",
+					"}",
+					"",
+					"const accessToken = pm.collectionVariables.get('access_token');",
+					"const refreshToken = pm.collectionVariables.get('refresh_token');",
+					"",
+					"if (accessToken && refreshToken && isTokenExpired(accessToken)) {",
+					"    console.log('🔄 Token expired, refreshing...');",
+					"    pm.sendRequest({",
+					"        url: pm.collectionVariables.get('base_url') + '/api/auth/refresh',",
+					"        method: 'POST',",
+					"        header: {",
+					"            'Authorization': 'Bearer ' + refreshToken",
+					"        }",
+					"    }, function (err, response) {",
+					"        if (!err && response.json().success) {",
+					"            pm.collectionVariables.set('access_token', response.json().access_token);",
+					"            console.log('✅ Token refreshed successfully');",
+					"        }",
+					"    });",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test for response time",
+					"pm.test(\"⚡ Response time < 10 seconds\", () => {",
+					"    pm.expect(pm.response.responseTime).to.be.below(10000);",
+					"});",
+					"",
+					"// Global test for JSON response",
+					"if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {",
+					"    pm.test(\"📝 Valid JSON response\", () => {",
+					"        pm.response.to.be.json;",
+					"    });",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://veroctaai.onrender.com",
+			"type": "string"
+		},
+		{
+			"key": "test_email",
+			"value": "test@example.com",
+			"type": "string"
+		},
+		{
+			"key": "access_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "last_report_id",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,62 @@
+services:
+  - type: web
+    name: veroctai-backend
+    runtime: docker
+    plan: starter
+    autoDeploy: true
+    healthCheckPath: /api/health
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    buildCommand: "docker build -t veroctai-backend ."
+    startCommand: "gunicorn --config config/gunicorn.conf.py app:app"
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONPATH
+        value: /app
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_PASSWORD
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: CUSTOM_DOMAIN
+        sync: false
+      - key: PORT
+        value: 10000
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: TIMEOUT
+        value: 120
+    disk:
+      name: veroctai-data
+      mountPath: /app/data
+      sizeGB: 1
+
+  # Optional: PostgreSQL database service
+  # - type: pserv
+  #   name: veroctai-db
+  #   plan: starter
+  #   env: postgresql
+  #   ipAllowList: []
+  #   envVars:
+  #     - key: POSTGRES_DB
+  #       value: veroctadb
+  #     - key: POSTGRES_USER
+  #       value: veroctauser
