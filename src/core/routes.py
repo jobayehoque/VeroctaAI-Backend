@@ -38,6 +38,13 @@ try:
 except ImportError as e:
     logging.warning(f"⚠️ Could not load static APIs: {str(e)}")
 
+# Import additional API routes
+try:
+    from . import api_routes_v2
+    logging.info("✅ Additional v2 API routes loaded successfully")
+except ImportError as e:
+    logging.warning(f"⚠️ Could not load additional API routes: {str(e)}")
+
 # Configure upload settings
 UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = {'csv'}
@@ -63,7 +70,7 @@ def allowed_logo_file(filename):
 def health_check():
     """API health check endpoint with system checks"""
     try:
-        from health import check_health
+        from .health import check_health
         return jsonify(check_health())
     except Exception as e:
         return jsonify({
@@ -119,7 +126,10 @@ def login():
                 refresh_token = None
 
         return jsonify({
-            'token': access_token,
+            'success': True,
+            'message': 'Login successful',
+            'access_token': access_token,
+            'token': access_token,  # For backward compatibility
             'refresh_token': refresh_token,
             'user': {
                 'id': user['id'],
@@ -129,7 +139,7 @@ def login():
             }
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/auth/register', methods=['POST'])
 def register():
@@ -164,17 +174,22 @@ def register():
                 refresh_token = None
 
         return jsonify({
-            'token': access_token,
+            'success': True,
+            'message': 'User registered successfully',
+            'access_token': access_token,
+            'token': access_token,  # For backward compatibility
             'refresh_token': refresh_token,
             'user': {
                 'id': user['id'],
                 'email': user['email'],
                 'role': user['role'],
-                'company': user['company']
+                'company': user['company'],
+                'first_name': data.get('first_name', ''),
+                'last_name': data.get('last_name', '')
             }
         }), 201
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/auth/me', methods=['GET'])
 @jwt_required()
@@ -196,6 +211,7 @@ def get_profile():
             created_at = None
 
         return jsonify({
+            'success': True,
             'user': {
                 'id': str(user['id']),
                 'email': user['email'],
@@ -216,7 +232,11 @@ def refresh_token():
     try:
         identity = get_jwt_identity()
         access_token = create_access_token(identity=identity)
-        return jsonify({'token': access_token})
+        return jsonify({
+            'success': True,
+            'access_token': access_token,
+            'token': access_token  # For backward compatibility
+        })
     except Exception as e:
         logging.error(f"Error refreshing token: {e}")
         return jsonify({'error': 'Failed to refresh token'}), 401
@@ -234,7 +254,10 @@ def logout():
             revoke_token(jti)
         except Exception as e:
             logging.error(f"Failed to revoke token: {e}")
-        return jsonify({'message': 'Logged out successfully'})
+        return jsonify({
+            'success': True,
+            'message': 'Logged out successfully'
+        })
     except Exception as e:
         logging.error(f"Logout error: {e}")
         return jsonify({'error': 'Logout failed'}), 500
@@ -254,6 +277,7 @@ def get_reports():
             db_reports = db_service.get_user_reports(str(user['id']))
             if db_reports:
                 return jsonify({
+                    'success': True,
                     'reports': db_reports,
                     'total': len(db_reports)
                 })
@@ -261,6 +285,7 @@ def get_reports():
         # Fallback to in-memory storage
         reports = get_reports_by_user(user['id'])
         return jsonify({
+            'success': True,
             'reports': [report.to_dict() for report in reports],
             'total': len(reports)
         })
@@ -864,34 +889,50 @@ def api_documentation():
         "title": "VeroctaAI Financial Analysis API",
         "version": "2.0.0",
         "description": "AI-powered financial intelligence and SpendScore analysis platform",
-        "base_url": request.host_url + "api/",
+        "base_url": request.host_url.rstrip('/'),
         "endpoints": {
-            "POST /upload": {
+            "POST /api/upload": {
                 "description": "Upload CSV and trigger analysis",
                 "parameters": {
                     "file": "CSV file (multipart/form-data)"
                 },
                 "response": "Analysis results with SpendScore and insights"
             },
-            "GET /spend-score": {
+            "GET /api/spend-score": {
                 "description": "Return JSON of latest SpendScore metrics",
                 "response": "SpendScore breakdown and tier information"
             },
-            "GET /report": {
+            "GET /api/report": {
                 "description": "Download latest PDF report",
                 "response": "PDF file download"
             },
-            "GET /verify-clone": {
+            "GET /api/verify-clone": {
                 "description": "Returns sync integrity status",
                 "response": "Clone verification report"
             },
-            "GET /health": {
+            "GET /api/health": {
                 "description": "Health check endpoint",
                 "response": "Service status"
             },
-            "GET /docs": {
+            "GET /api/docs": {
                 "description": "This API documentation",
                 "response": "API documentation JSON"
+            },
+            "GET /api/v2/notifications": {
+                "description": "Get user notifications",
+                "response": "User notifications list"
+            },
+            "POST /api/auth/login": {
+                "description": "User authentication",
+                "response": "JWT tokens and user data"
+            },
+            "POST /api/auth/register": {
+                "description": "User registration",
+                "response": "JWT tokens and user data"
+            },
+            "GET /api/reports": {
+                "description": "List user reports",
+                "response": "User reports list"
             }
         },
         "authentication": {

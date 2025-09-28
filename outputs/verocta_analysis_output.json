@@ -1,0 +1,55 @@
+{
+  "spend_score": 90,
+  "tier_info": {
+    "color": "Green",
+    "tier": "Excellent",
+    "green_reward_eligible": true,
+    "description": "Outstanding financial management!"
+  },
+  "score_breakdown": {
+    "frequency_score": 96.67,
+    "category_diversity": 100,
+    "budget_adherence": 54.51,
+    "redundancy_detection": 100,
+    "spike_detection": 100,
+    "waste_ratio": 100,
+    "final_score": 90,
+    "individual_scores": {
+      "frequency_score": 96.66666666666667,
+      "category_diversity": 100,
+      "budget_adherence": 54.512799339388934,
+      "redundancy_detection": 100,
+      "spike_detection": 100,
+      "waste_ratio": 100
+    }
+  },
+  "suggestions": [
+    {
+      "priority": "High",
+      "text": "Consider renegotiating or bundling your software subscriptions, particularly the Adobe Creative Suite, which constitutes a substantial portion of your software expenses. Explore competitive alternatives or bulk discounts to reduce the $299.99 monthly cost."
+    },
+    {
+      "priority": "Medium",
+      "text": "Evaluate the necessity of the recent office chair replacement costing $299.99. If such purchases are frequent, establish a procurement policy to ensure cost-effective purchasing, possibly opting for bulk or refurbished options."
+    },
+    {
+      "priority": "Low",
+      "text": "Review the recurring office supplies purchases, such as the $150 spent at Staples. Compare bulk purchasing options or negotiate discounts with vendors to optimize long-term savings on office essentials."
+    }
+  ],
+  "total_transactions": 16,
+  "total_amount": 1448.06,
+  "enhanced_metrics": {
+    "total_transactions": 16,
+    "total_amount": 1448.06,
+    "median_amount": 60.55,
+    "mean_amount": 90.50375,
+    "unique_categories": 5,
+    "unique_vendors": 16
+  },
+  "filename": "test_data.csv",
+  "green_reward_eligible": true,
+  "company_name": "Test Corporation",
+  "logo_path": null,
+  "mapping_used": {}
+}

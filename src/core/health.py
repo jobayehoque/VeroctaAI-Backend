@@ -49,15 +49,15 @@ def check_health():
     if os.environ.get('SUPABASE_URL') and os.environ.get('SUPABASE_PASSWORD'):
         try:
             # Try to import database module and test connection
-            from database import test_connection
-            if test_connection():
+            from .database import db_service
+            if db_service and db_service.connected:
                 db_check = {"status": "pass", "details": "✅ Database connected"}
             else:
                 db_check = {"status": "fail", "details": "❌ Database connection failed"}
-                health_status["status"] = "unhealthy"
+                health_status["status"] = "degraded"
         except Exception as e:
             db_check = {"status": "fail", "details": f"❌ Database error: {str(e)}"}
-            health_status["status"] = "unhealthy"
+            health_status["status"] = "degraded"
     
     health_status["checks"]["database"] = db_check
     
