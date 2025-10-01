@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: veroctai-backend
+    name: veroctai-backend-v2
     runtime: docker
     plan: starter
     autoDeploy: true
@@ -9,6 +9,7 @@ services:
     dockerContext: .
     buildCommand: "docker build -t veroctai-backend ."
     startCommand: "gunicorn --config config/gunicorn.conf.py app:app"
+    branch: main
     envVars:
       - key: FLASK_ENV
         value: production
