@@ -1,5 +1,5 @@
 {
-  "spend_score": 90,
+  "spend_score": 95,
   "tier_info": {
     "color": "Green",
     "tier": "Excellent",
@@ -7,17 +7,17 @@
     "description": "Outstanding financial management!"
   },
   "score_breakdown": {
-    "frequency_score": 96.67,
+    "frequency_score": 100,
     "category_diversity": 100,
-    "budget_adherence": 54.51,
+    "budget_adherence": 73.75,
     "redundancy_detection": 100,
     "spike_detection": 100,
     "waste_ratio": 100,
-    "final_score": 90,
+    "final_score": 95,
     "individual_scores": {
-      "frequency_score": 96.66666666666667,
+      "frequency_score": 100,
       "category_diversity": 100,
-      "budget_adherence": 54.512799339388934,
+      "budget_adherence": 73.75,
       "redundancy_detection": 100,
       "spike_detection": 100,
       "waste_ratio": 100
@@ -26,30 +26,30 @@
   "suggestions": [
     {
       "priority": "High",
-      "text": "Consider renegotiating or bundling your software subscriptions, particularly the Adobe Creative Suite, which constitutes a substantial portion of your software expenses. Explore competitive alternatives or bulk discounts to reduce the $299.99 monthly cost."
+      "text": "Negotiate bulk purchase or long-term contracts with the Equipment and Software vendors to take advantage of volume discounts. Given that Equipment and Software constitute over 60% of the total spending, consolidating purchases with fewer vendors could yield significant cost savings."
     },
     {
       "priority": "Medium",
-      "text": "Evaluate the necessity of the recent office chair replacement costing $299.99. If such purchases are frequent, establish a procurement policy to ensure cost-effective purchasing, possibly opting for bulk or refurbished options."
+      "text": "Implement a procurement policy for marketing expenses that involves at least two competitive bids for any campaigns over $500. This will help ensure that you are receiving the best possible price and service, potentially reducing the Marketing category spend."
     },
     {
       "priority": "Low",
-      "text": "Review the recurring office supplies purchases, such as the $150 spent at Staples. Compare bulk purchasing options or negotiate discounts with vendors to optimize long-term savings on office essentials."
+      "text": "Review the necessity of travel expenses and explore virtual meeting tools as alternatives. With Travel constituting 11.8% of the total expenses, reducing non-essential travel could lower overall costs without impacting business operations."
     }
   ],
-  "total_transactions": 16,
-  "total_amount": 1448.06,
+  "total_transactions": 5,
+  "total_amount": 5100.0,
   "enhanced_metrics": {
-    "total_transactions": 16,
-    "total_amount": 1448.06,
-    "median_amount": 60.55,
-    "mean_amount": 90.50375,
+    "total_transactions": 5,
+    "total_amount": 5100.0,
+    "median_amount": 800.0,
+    "mean_amount": 1020.0,
     "unique_categories": 5,
-    "unique_vendors": 16
+    "unique_vendors": 5
   },
-  "filename": "test_data.csv",
+  "filename": "test_upload.csv",
   "green_reward_eligible": true,
-  "company_name": "Test Corporation",
+  "company_name": null,
   "logo_path": null,
   "mapping_used": {}
 }

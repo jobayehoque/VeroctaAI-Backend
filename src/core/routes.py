@@ -13,6 +13,9 @@ try:
     from .database import db_service
 except ImportError:
     db_service = None
+except Exception as e:
+    logging.warning(f"Database service import warning: {str(e)}")
+    db_service = None
 from ..utils.csv_parser import parse_csv_file, parse_csv_file_with_mapping
 from ..utils.gpt_utils import generate_financial_insights
 try:
@@ -44,6 +47,13 @@ try:
     logging.info("✅ Additional v2 API routes loaded successfully")
 except ImportError as e:
     logging.warning(f"⚠️ Could not load additional API routes: {str(e)}")
+
+# Import billing routes
+try:
+    from . import billing_routes
+    logging.info("✅ Billing routes loaded successfully")
+except ImportError as e:
+    logging.warning(f"⚠️ Could not load billing routes: {str(e)}")
 
 # Configure upload settings
 UPLOAD_FOLDER = 'uploads'

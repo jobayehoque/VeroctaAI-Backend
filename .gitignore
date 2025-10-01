@@ -158,6 +158,17 @@ logs/*
 !logs/.gitkeep
 *.log
 verocta.log
+server.log
+
+# Test files
+test_*.py
+*_test.py
+uploads/test_*
+uploads/temp_*
+
+# Generated outputs
+outputs/*.pdf
+outputs/*.json
 
 # Configuration
 config/.env.local

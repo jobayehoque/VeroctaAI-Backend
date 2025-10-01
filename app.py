@@ -17,5 +17,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 from src.core.app import app
 
 if __name__ == '__main__':
-    # This will use the configuration from src/core/app.py
-    app.run()
+    # Use port 5002 to avoid conflicts with Apple AirPlay on port 5000
+    port = int(os.environ.get('PORT', 5002))
+    app.run(host='0.0.0.0', port=port, debug=False)

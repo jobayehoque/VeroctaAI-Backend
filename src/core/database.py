@@ -16,39 +16,48 @@ engine = None
 Session = None
 connected = False
 
-# Try to connect to PostgreSQL database
-if DATABASE_URL:
-    try:
-        logging.info("Attempting database connection using DATABASE_URL")
-        
-        # Create the SQLAlchemy engine with optimized settings for Supabase
-        engine = create_engine(
-            DATABASE_URL,
-            poolclass=NullPool,  # Recommended for Supabase pooling
-            pool_pre_ping=True,
-            connect_args={
-                "sslmode": "require",
-                "connect_timeout": 10,
-                "application_name": "VeroctaAI-Backend"
-            }
-        )
-        
-        # Test the connection
-        with engine.connect() as connection:
-            result = connection.execute(text("SELECT 1"))
-            logging.info("✅ Database connection established and tested successfully")
-        
-        # Create session maker
-        Session = sessionmaker(bind=engine)
-        connected = True
-        
-    except Exception as e:
-        logging.warning(f"⚠️ Database connection failed: {str(e)} - using in-memory storage")
-        engine = None  
-        Session = None
-        connected = False
-else:
-    logging.warning("⚠️ DATABASE_URL not found - using in-memory storage only")
+# Initialize database connection lazily
+def initialize_database():
+    """Initialize database connection - called lazily when needed"""
+    global engine, Session, connected
+    
+    if DATABASE_URL and not connected:
+        try:
+            logging.info("Attempting database connection using DATABASE_URL")
+            
+            # Create the SQLAlchemy engine with optimized settings for Supabase
+            engine = create_engine(
+                DATABASE_URL,
+                poolclass=NullPool,  # Recommended for Supabase pooling
+                pool_pre_ping=True,
+                connect_args={
+                    "sslmode": "require",
+                    "connect_timeout": 5,  # Reduced timeout
+                    "application_name": "VeroctaAI-Backend"
+                }
+            )
+            
+            # Test the connection with timeout
+            with engine.connect() as connection:
+                result = connection.execute(text("SELECT 1"))
+                logging.info("✅ Database connection established and tested successfully")
+            
+            # Create session maker
+            Session = sessionmaker(bind=engine)
+            connected = True
+            return True
+            
+        except Exception as e:
+            logging.warning(f"⚠️ Database connection failed: {str(e)} - using in-memory storage")
+            engine = None  
+            Session = None
+            connected = False
+            return False
+    elif not DATABASE_URL:
+        logging.warning("⚠️ DATABASE_URL not found - using in-memory storage only")
+        return False
+    
+    return connected
 
 def test_connection():
     """Test database connection - required for health checks"""
@@ -129,13 +138,24 @@ class DatabaseService:
     """Database service for VeroctaAI using SQLAlchemy"""
     
     def __init__(self):
-        self.connected = connected
-        self.engine = engine
-        self.Session = Session
+        self.connected = False
+        self.engine = None
+        self.Session = None
+        self._initialize_attempted = False
+    
+    def _ensure_connected(self):
+        """Ensure database is connected before operations"""
+        if not self._initialize_attempted:
+            self._initialize_attempted = True
+            if initialize_database():
+                self.connected = connected
+                self.engine = engine 
+                self.Session = Session
+        return self.connected
         
     def create_tables_if_not_exist(self):
         """Create tables if they don't exist"""
-        if not self.connected:
+        if not self._ensure_connected():
             logging.warning("Database not connected - skipping table creation")
             return
             
@@ -149,7 +169,7 @@ class DatabaseService:
     
     def get_user_by_email(self, email: str) -> Optional[Dict]:
         """Get user by email from database"""
-        if not self.connected or not self.Session:
+        if not self._ensure_connected() or not self.Session:
             return None
             
         try:
@@ -174,7 +194,7 @@ class DatabaseService:
     
     def create_user(self, email: str, password_hash: str, company: str = None, role: str = "user") -> Optional[Dict]:
         """Create new user in database"""
-        if not self.connected or not self.Session:
+        if not self._ensure_connected() or not self.Session:
             return None
             
         try:
@@ -210,7 +230,7 @@ class DatabaseService:
     def create_report(self, user_id: str, title: str, company: str, data: Dict, 
                      spend_score: Optional[int] = None, insights: Optional[Dict] = None, analysis: Optional[Dict] = None) -> Optional[Dict]:
         """Create new report in database"""
-        if not self.connected or not self.Session:
+        if not self._ensure_connected() or not self.Session:
             return None
             
         try:
@@ -251,7 +271,7 @@ class DatabaseService:
     
     def get_user_reports(self, user_id: str, limit: int = 50) -> List[Dict]:
         """Get user reports from database"""
-        if not self.connected:
+        if not self._ensure_connected():
             return []
             
         try:
@@ -281,7 +301,7 @@ class DatabaseService:
     
     def get_report_by_id(self, report_id: str, user_id: str = None) -> Optional[Dict]:
         """Get specific report by ID"""
-        if not self.connected:
+        if not self._ensure_connected():
             return None
             
         try:
@@ -314,7 +334,7 @@ class DatabaseService:
     def save_insights(self, report_id: str, user_id: str, ai_insights: Dict, 
                      recommendations: List[str], metrics: Dict) -> Optional[Dict]:
         """Save AI insights to database"""
-        if not self.connected:
+        if not self._ensure_connected():
             return None
             
         try:
@@ -355,7 +375,7 @@ class DatabaseService:
     
     def get_next_user_id(self) -> int:
         """Get next available user ID"""
-        if not self.connected:
+        if not self._ensure_connected():
             return 1
             
         try:
@@ -369,7 +389,7 @@ class DatabaseService:
     
     def get_user_by_id(self, user_id: str) -> Optional[Dict]:
         """Get user by ID from database"""
-        if not self.connected:
+        if not self._ensure_connected():
             return None
             
         try:
@@ -394,7 +414,7 @@ class DatabaseService:
 
     def delete_report(self, report_id: str, user_id: str) -> bool:
         """Delete a report by ID for a specific user"""
-        if not self.connected:
+        if not self._ensure_connected():
             return False
             
         try:
@@ -416,7 +436,7 @@ class DatabaseService:
 
     def get_dashboard_stats(self, user_id: str) -> Dict:
         """Get dashboard statistics for user"""
-        if not self.connected:
+        if not self._ensure_connected():
             return {
                 'total_reports': 0,
                 'avg_spend_score': 0,

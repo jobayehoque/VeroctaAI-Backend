@@ -223,7 +223,7 @@ class EnhancedDatabaseService:
         self._init_connection()
     
     def _init_connection(self):
-        """Initialize database connection"""
+        """Initialize database connection with timeout"""
         if not self.database_url:
             logging.warning("⚠️ DATABASE_URL not found - using in-memory storage only")
             return
@@ -238,7 +238,7 @@ class EnhancedDatabaseService:
                 pool_pre_ping=True,
                 connect_args={
                     "sslmode": "require",
-                    "connect_timeout": 10,
+                    "connect_timeout": 5,  # Reduced timeout
                     "application_name": "VeroctaAI-Backend-Enhanced"
                 },
                 echo=False  # Set to True for SQL debugging
@@ -254,8 +254,11 @@ class EnhancedDatabaseService:
             self.Session = sessionmaker(bind=self.engine)
             self.connected = True
             
-            # Create tables
-            self.create_all_tables()
+            # Create tables in background - don't block startup
+            try:
+                self.create_all_tables()
+            except Exception as table_error:
+                logging.warning(f"⚠️ Enhanced table creation failed: {str(table_error)} - continuing without tables")
             
         except Exception as e:
             logging.error(f"⚠️ Enhanced database connection failed: {str(e)}")
@@ -269,7 +272,13 @@ class EnhancedDatabaseService:
         try:
             Base.metadata.create_all(self.engine)
             logging.info("✅ Enhanced database schema ready")
-            self._seed_initial_data()
+            
+            # Seed data in background - don't block
+            try:
+                self._seed_initial_data()
+            except Exception as seed_error:
+                logging.warning(f"⚠️ Data seeding failed: {str(seed_error)} - continuing without seed data")
+                
         except Exception as e:
             logging.error(f"Error creating enhanced tables: {str(e)}")
     
@@ -331,5 +340,12 @@ class EnhancedDatabaseService:
             return None
         return self.Session()
 
-# Initialize enhanced database service
-enhanced_db = EnhancedDatabaseService()
+# Initialize enhanced database service lazily
+enhanced_db = None
+
+def get_enhanced_db():
+    """Get or initialize enhanced database service"""
+    global enhanced_db
+    if enhanced_db is None:
+        enhanced_db = EnhancedDatabaseService()
+    return enhanced_db

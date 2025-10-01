@@ -51,36 +51,25 @@ if not session_secret:
 app.secret_key = session_secret
 logging.info("Flask app secret key configured successfully")
 
-# Import and configure enhanced database service
+# Import and configure enhanced database service (lazy loading)
 try:
-    from .database_enhanced import enhanced_db
-    if enhanced_db.connected:
-        app.config["DATABASE_URL"] = "configured"  # Flag that database is available
-        app.config["ENHANCED_DB"] = enhanced_db  # Store enhanced DB instance
-        logging.info("✅ Enhanced database connection established via SQLAlchemy")
-        logging.info("✅ Enhanced database tables initialized")
-    else:
-        app.config["DATABASE_URL"] = None
-        logging.warning("⚠️ Enhanced database connection failed - falling back to legacy database")
-        # Fallback to legacy database
-        from .database import db_service
-        if db_service.connected:
-            app.config["DATABASE_URL"] = "configured"
-            logging.info("✅ Legacy database connection established")
-        else:
-            app.config["DATABASE_URL"] = None
-            logging.warning("⚠️ All database connections failed - using in-memory storage only")
+    from .database_enhanced import get_enhanced_db
+    # Don't initialize here - will be done on first use
+    app.config["DATABASE_URL"] = "available"  # Flag that database code is available
+    logging.info("✅ Enhanced database service available (lazy loading)")
 except Exception as e:
-    logging.error(f"⚠️ Enhanced database service import failed: {str(e)} - falling back to legacy")
+    logging.warning(f"⚠️ Enhanced database service import failed: {str(e)} - falling back to legacy")
     try:
         from .database import db_service
-        if db_service.connected:
+        if db_service._ensure_connected():
             app.config["DATABASE_URL"] = "configured"
             logging.info("✅ Legacy database connection established")
         else:
             app.config["DATABASE_URL"] = None
+            logging.warning("⚠️ Database connection failed - using in-memory storage only")
     except:
         app.config["DATABASE_URL"] = None
+        logging.warning("⚠️ All database connections failed - using in-memory storage only")
 
 # Enable CORS for development and production
 allowed_origins = [
@@ -130,7 +119,7 @@ except ImportError:
 if __name__ == '__main__':
     # Production configuration
     is_production = os.environ.get('FLASK_ENV') == 'production'
-    port = int(os.environ.get('PORT', 5000))
+    port = int(os.environ.get('PORT', 5002))  # Use 5002 to avoid conflicts with AirPlay
     host = '0.0.0.0'  # Always use 0.0.0.0 for Render compatibility
     debug = not is_production
     

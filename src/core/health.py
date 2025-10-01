@@ -44,20 +44,12 @@ def check_health():
     
     health_status["checks"]["environment"] = env_check
     
-    # Check database connection
+    # Check database connection (non-blocking)
     db_check = {"status": "pass", "details": "Database not configured"}
     if os.environ.get('SUPABASE_URL') and os.environ.get('SUPABASE_PASSWORD'):
-        try:
-            # Try to import database module and test connection
-            from .database import db_service
-            if db_service and db_service.connected:
-                db_check = {"status": "pass", "details": "✅ Database connected"}
-            else:
-                db_check = {"status": "fail", "details": "❌ Database connection failed"}
-                health_status["status"] = "degraded"
-        except Exception as e:
-            db_check = {"status": "fail", "details": f"❌ Database error: {str(e)}"}
-            health_status["status"] = "degraded"
+        db_check = {"status": "pass", "details": "✅ Database URL configured (connection not tested in health check)"}
+    else:
+        db_check = {"status": "pass", "details": "⚠️ Database not configured (using in-memory storage)"}
     
     health_status["checks"]["database"] = db_check
     
